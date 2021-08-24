@@ -1,6 +1,8 @@
 package ezinsurance;
 
+import ezinsurance.jpa.Mypage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,5 +51,36 @@ public class MypageController {
         
 
 		return ResponseEntity.ok().body(result);
+    }
+
+    @RequestMapping(value = "/mypages/getMypages", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> getMypages(@RequestBody HashMap<String, Object> userMap) {
+
+
+        System.out.println("\n\n##### getMypages userMap : " + userMap + "\n\n");
+
+        Map<String, Object> result = new HashMap<>();
+
+        String  custNm = (String)userMap.get("custNm"); //
+
+        List<Mypage> mypages = new ArrayList<>();
+
+        if(StringUtils.isEmpty(custNm)) {
+            Iterable<Mypage> mypageIt = mypageRepository.findAll();
+
+            if( mypageIt!= null)
+            {
+                mypageIt.forEach(mypages::add);
+            }
+
+        }
+        else {
+            mypages = mypageRepository.findByCustNm(custNm);
+        }
+
+        result.put("data", mypages);
+
+
+        return ResponseEntity.ok().body(result);
     }
 }
